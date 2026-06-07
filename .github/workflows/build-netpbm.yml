@@ -66,6 +66,7 @@ jobs:
           DEFAULT_TARGET = nonmerge
           NETPBMLIBTYPE=unixstatic
           NETPBMLIBSUFFIX=a
+          DONT_HAVE_PROCESS_MGMT = Y
           STATICLIB_TOO=N
           EXE = .exe
           OMIT_NETWORK = Y
