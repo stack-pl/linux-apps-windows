@@ -45,7 +45,6 @@ jobs:
             mingw-w64-ucrt-x86_64-zlib
             mingw-w64-ucrt-x86_64-xz
             mingw-w64-ucrt-x86_64-libxml2
-            mingw-w64-ucrt-x86_64-glfw
 
       - name: Download Netpbm
         run: |
@@ -63,10 +62,28 @@ jobs:
           cp config.mk.in config.mk
 
           cat >> config.mk <<EOF
-          DEFAULT_TARGET = mingw
-          BUILD_FIASCO = N
-          CC = gcc
-          CFLAGS_SHLIB += -O2
+          #### Lines below were added by GitHub Actions builder ####
+          DEFAULT_TARGET = nonmerge
+          NETPBMLIBTYPE=unixstatic
+          NETPBMLIBSUFFIX=a
+          STATICLIB_TOO=N
+          EXE = .exe
+          OMIT_NETWORK = Y
+          SYMLINK = ln -s
+          DLLVER=$(NETPBM_MAJOR_RELEASE)
+          LDSHLIB = -shared -Wl,--image-base=0x10000000 -Wl,--enable-auto-import
+          MSVCRT = Y
+          WINICON_OBJECT = $(BUILDDIR)/icon/netpbm.o
+          LINKERISCOMPILER = Y
+          TIFFLIB = libtiff.dll
+          JPEGLIB = libjpeg.dll
+          PNGHDR_DIR = USE_PKG_CONFIG.a
+          PNGLIB = USE_PKG_CONFIG.a
+          ZLIB = libz.dll
+          X11HDR_DIR = USE_PKGCONFIG.a
+          X11LIB = USE_PKGCONFIG.a
+          NETPBM_DOCURL = http://netpbm.sourceforge.net/doc/
+          WANT_SSE = Y
           EOF
 
       - name: Build Netpbm
