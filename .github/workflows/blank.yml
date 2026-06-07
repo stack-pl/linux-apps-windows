@@ -44,7 +44,7 @@ jobs:
           unzip
           zip
           curl
-          ghostscript
+          mingw-w64-ucrt-x86_64-ghostscript
   
     - name: Download source archive
       run: |
