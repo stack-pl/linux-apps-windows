@@ -45,6 +45,9 @@ jobs:
           zip
           curl
           mingw-w64-ucrt-x86_64-ghostscript
+          mingw-w64-ucrt-x86_64-gsfonts
+          mingw-w64-ucrt-x86_64-uchardet
+          netpbm
   
     - name: Download source archive
       run: |
