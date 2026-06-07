@@ -47,7 +47,7 @@ jobs:
 
       - name: Download Netpbm
         run: |
-          curl -L -O \
+          curl -L \
             -o netpbm.tgz \
             https://netix.dl.sourceforge.net/project/netpbm/super_stable/${NETPBM_VERSION}/netpbm-${NETPBM_VERSION}.tgz
       - name: Extract sources
