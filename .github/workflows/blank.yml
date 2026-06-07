@@ -37,6 +37,11 @@ jobs:
           mingw-w64-ucrt-x86_64-binutils
           mingw-w64-ucrt-x86_64-make
           mingw-w64-ucrt-x86_64-gcc-libs
+          mingw-w64-ucrt-x86_64-toolchain 
+          mingw-w64-ucrt-x86_64-cmake
+          mingw-w64-ucrt-x86_64-ghostscript
+          mingw-w64-ucrt-x86_64-gsfonts
+          mingw-w64-ucrt-x86_64-uchardet
           perl
           git
           tar
@@ -44,22 +49,55 @@ jobs:
           unzip
           zip
           curl
-          mingw-w64-ucrt-x86_64-ghostscript
-          mingw-w64-ucrt-x86_64-gsfonts
-          mingw-w64-ucrt-x86_64-uchardet
-          netpbm
+    #       netpbm
+
+    # - name: Download source archive (netpbm)
+    #   run: |
+    #     curl -L \
+    #       -o groff.tar.gz \
+    #       "https://ftp.gnu.org/gnu/groff/groff-${GROFF_VERSION}.tar.gz"
   
-    - name: Download source archive
+    # - name: Extract source archive (netpbm)
+    #   run: |
+    #     tar xf groff.tar.gz
+  
+    # - name: Configure (netpbm)
+    #   run: |
+    #     cd groff-${GROFF_VERSION}
+  
+    #     ./configure \
+    #       --prefix=/opt/groff \
+    #       --disable-silent-rules
+  
+    # - name: Build (netpbm)
+    #   run: |
+    #     cd groff-${GROFF_VERSION}
+  
+    #     make -j4
+  
+    # - name: Run tests (netpbm)
+    #   run: |
+    #     cd groff-${GROFF_VERSION}
+  
+    #     make check || true
+  
+    # - name: Install (netpbm)
+    #   run: |
+    #     cd groff-${GROFF_VERSION}
+  
+    #     make install
+  
+    - name: Download source archive (groff)
       run: |
         curl -L \
           -o groff.tar.gz \
           "https://ftp.gnu.org/gnu/groff/groff-${GROFF_VERSION}.tar.gz"
   
-    - name: Extract source archive
+    - name: Extract source archive (groff)
       run: |
         tar xf groff.tar.gz
   
-    - name: Configure
+    - name: GROFF Configure (groff)
       run: |
         cd groff-${GROFF_VERSION}
   
@@ -67,19 +105,19 @@ jobs:
           --prefix=/opt/groff \
           --disable-silent-rules
   
-    - name: Build
+    - name: Build (groff)
       run: |
         cd groff-${GROFF_VERSION}
   
         make -j4
   
-    - name: Run tests
+    - name: Run tests (groff)
       run: |
         cd groff-${GROFF_VERSION}
   
         make check || true
   
-    - name: Install
+    - name: Install (groff)
       run: |
         cd groff-${GROFF_VERSION}
   
