@@ -20,7 +20,7 @@ jobs:
         shell: msys2 {0}
 
     env:
-      NETPBM_VERSION: "11.10.1"
+      NETPBM_VERSION: "10.86.49"
       ARTIFACT_NAME: "netpbm-ucrt64"
 
     steps:
@@ -47,13 +47,12 @@ jobs:
 
       - name: Download Netpbm
         run: |
-          curl -L \
-            -o netpbm.tar.xz \
-            https://downloads.sourceforge.net/project/netpbm/super_stable/${NETPBM_VERSION}/netpbm-${NETPBM_VERSION}.tar.xz
-
+          curl -L -O \
+            -o netpbm.tgz \
+            https://netix.dl.sourceforge.net/project/netpbm/super_stable/${NETPBM_VERSION}/netpbm-${NETPBM_VERSION}.tgz
       - name: Extract sources
         run: |
-          tar -xf netpbm.tar.xz
+          tar -xf netpbm.tgz
           mv netpbm-* netpbm-src
 
       - name: Configure build
