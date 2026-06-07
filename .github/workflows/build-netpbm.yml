@@ -45,7 +45,7 @@ jobs:
             mingw-w64-ucrt-x86_64-zlib
             mingw-w64-ucrt-x86_64-xz
             mingw-w64-ucrt-x86_64-libxml2
-            libX11-devel
+            mingw-w64-ucrt-x86_64-SDL2
 
       - name: Download Netpbm
         run: |
