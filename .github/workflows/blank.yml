@@ -1,0 +1,134 @@
+
+name: Build and Release groff for Windows
+
+on:
+workflow_dispatch:
+
+push:
+tags:
+- "v*"
+
+permissions:
+contents: write
+
+jobs:
+build:
+runs-on: windows-latest
+
+env:
+  GROFF_VERSION: "1.24.1"
+  PACKAGE_NAME: "groff-1.24.1-windows-x64"
+
+defaults:
+  run:
+    shell: msys2 {0}
+
+steps:
+
+  - name: Checkout
+    uses: actions/checkout@v4
+
+  - name: Setup MSYS2
+    uses: msys2/setup-msys2@v2
+    with:
+      msystem: UCRT64
+      update: true
+      install: >-
+        base-devel
+        mingw-w64-ucrt-x86_64-gcc
+        mingw-w64-ucrt-x86_64-binutils
+        mingw-w64-ucrt-x86_64-make
+        mingw-w64-ucrt-x86_64-gcc-libs
+        perl
+        git
+        tar
+        gzip
+        unzip
+        zip
+        curl
+
+  - name: Download source archive
+    run: |
+      curl -L \
+        -o groff.tar.gz \
+        "https://ftp.gnu.org/gnu/groff/groff-${GROFF_VERSION}.tar.gz"
+
+  - name: Extract source archive
+    run: |
+      tar xf groff.tar.gz
+
+  - name: Configure
+    run: |
+      cd groff-${GROFF_VERSION}
+
+      ./configure \
+        --prefix=/opt/groff \
+        --disable-silent-rules
+
+  - name: Build
+    run: |
+      cd groff-${GROFF_VERSION}
+
+      make -j4
+
+  - name: Run tests
+    run: |
+      cd groff-${GROFF_VERSION}
+
+      make check || true
+
+  - name: Install
+    run: |
+      cd groff-${GROFF_VERSION}
+
+      make install
+
+  - name: Prepare release directory
+    run: |
+      mkdir release
+
+      cp -R /opt/groff/* release/
+
+  - name: Copy runtime DLLs
+    run: |
+      cp /ucrt64/bin/libstdc++-6.dll release/bin/ || true
+      cp /ucrt64/bin/libgcc_s_seh-1.dll release/bin/ || true
+      cp /ucrt64/bin/libwinpthread-1.dll release/bin/ || true
+
+  - name: Create VERSION.txt
+    run: |
+      cat > release/VERSION.txt << EOF
+      groff ${GROFF_VERSION}
+      Windows x64 build
+      Built with MinGW-w64 UCRT64
+      EOF
+
+  - name: Create ZIP package
+    run: |
+      cd release
+
+      zip -r ../${PACKAGE_NAME}.zip .
+
+  - name: Generate SHA256
+    run: |
+      sha256sum ${PACKAGE_NAME}.zip \
+        > ${PACKAGE_NAME}.zip.sha256
+
+  - name: Upload workflow artifact
+    uses: actions/upload-artifact@v4
+    with:
+      name: groff-build
+      path: |
+        ${{ env.PACKAGE_NAME }}.zip
+        ${{ env.PACKAGE_NAME }}.zip.sha256
+
+  - name: Publish GitHub Release
+    uses: softprops/action-gh-release@v2
+    with:
+      files: |
+        ${{ env.PACKAGE_NAME }}.zip
+        ${{ env.PACKAGE_NAME }}.zip.sha256
+      generate_release_notes: true
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
