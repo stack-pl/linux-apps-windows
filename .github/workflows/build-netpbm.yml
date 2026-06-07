@@ -63,6 +63,7 @@ jobs:
 
           cat >> config.mk <<EOF
           #### Lines below were added by GitHub Actions builder ####
+          CFLAGS= -std=c17
           DEFAULT_TARGET = nonmerge
           NETPBMLIBTYPE=unixstatic
           NETPBMLIBSUFFIX=a
