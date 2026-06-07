@@ -1,0 +1,98 @@
+name: Build Netpbm (UCRT64)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    env:
+      NETPBM_VERSION: "11.10.1"
+      ARTIFACT_NAME: "netpbm-ucrt64"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            base-devel
+            git
+            zip
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-make
+            mingw-w64-ucrt-x86_64-toolchain
+            mingw-w64-ucrt-x86_64-libjpeg-turbo
+            mingw-w64-ucrt-x86_64-libtiff
+            mingw-w64-ucrt-x86_64-libpng
+            mingw-w64-ucrt-x86_64-zlib
+            mingw-w64-ucrt-x86_64-liblzma
+
+      - name: Download Netpbm
+        run: |
+          curl -L \
+            -o netpbm.tar.xz \
+            https://downloads.sourceforge.net/project/netpbm/super_stable/${NETPBM_VERSION}/netpbm-${NETPBM_VERSION}.tar.xz
+
+      - name: Extract sources
+        run: |
+          tar -xf netpbm.tar.xz
+          mv netpbm-* netpbm-src
+
+      - name: Configure build
+        working-directory: netpbm-src
+        run: |
+          cp config.mk.in config.mk
+
+          cat >> config.mk <<EOF
+          DEFAULT_TARGET = mingw
+          BUILD_FIASCO = N
+          CC = gcc
+          CFLAGS_SHLIB += -O2
+          EOF
+
+      - name: Build Netpbm
+        working-directory: netpbm-src
+        run: |
+          make -j$(nproc)
+
+      - name: Prepare package
+        run: |
+          mkdir package
+
+          cp -r netpbm-src/bin package/
+          cp -r netpbm-src/lib package/
+          cp -r netpbm-src/include package/
+
+      - name: Create ZIP archive
+        run: |
+          zip -r "${ARTIFACT_NAME}.zip" package
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: netpbm-ucrt64
+          path: netpbm-ucrt64.zip
+
+      - name: Publish Release Asset
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: netpbm-ucrt64.zip
