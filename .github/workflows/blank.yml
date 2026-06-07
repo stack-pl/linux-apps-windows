@@ -44,6 +44,7 @@ jobs:
           unzip
           zip
           curl
+          ghostscript
   
     - name: Download source archive
       run: |
